@@ -6,6 +6,11 @@
 - [x] post、get、put、delete
 - [x] HUD 方式 post、get、put、delete
 - [x] 设置全局 header
+- [x] 新增下载和上传功能(不稳定，完善中........)
+
+## 近期更新
+
+> 增加下载和上传，功能完善中。。。。。
 
 ## 运行环境
 
@@ -49,7 +54,7 @@ KLNetwork.startNetworkMonitoring()
 不显示加载
 
 ```swift
-KLNetWork.get("url", success: { (response) in
+KLNetWork.get("url", parameters: nil, success: { (response) in
     // 请求成功回调
 }) { (error) in
    // 请求错误回调
@@ -59,7 +64,7 @@ KLNetWork.get("url", success: { (response) in
 显示加载
 
 ```swift
-KLNetWork.getWithShowHUD("url", success: { (response) in
+KLNetWork.getWithShowHUD("url", parameters: nil, success: { (response) in
 // 请求成功回调
 }) { (error) in
 // 请求错误回调
@@ -71,7 +76,7 @@ KLNetWork.getWithShowHUD("url", success: { (response) in
 不显示加载
 
 ```swift
-KLNetWork.post("url", success: { (response) in
+KLNetWork.post("url", parameters: nil, success: { (response) in
 // 请求成功回调
 }) { (error) in
 // 请求错误回调
@@ -81,7 +86,7 @@ KLNetWork.post("url", success: { (response) in
 显示加载
 
 ```swift
-KLNetWork.postWithShowHUD("url", success: { (response) in
+KLNetWork.postWithShowHUD("url", parameters: nil, success: { (response) in
 // 请求成功回调
 }) { (error) in
 // 请求错误回调
@@ -93,7 +98,7 @@ KLNetWork.postWithShowHUD("url", success: { (response) in
 不显示加载
 
 ```swift
-KLNetWork.put("url", success: { (response) in
+KLNetWork.put("url", parameters: nil, success: { (response) in
 // 请求成功回调
 }) { (error) in
 // 请求错误回调
@@ -103,7 +108,7 @@ KLNetWork.put("url", success: { (response) in
 显示加载
 
 ```swift
-KLNetWork.putWithShowHUD("url", success: { (response) in
+KLNetWork.putWithShowHUD("url", parameters: nil, success: { (response) in
 // 请求成功回调
 }) { (error) in
 // 请求错误回调
@@ -115,7 +120,7 @@ KLNetWork.putWithShowHUD("url", success: { (response) in
 不显示加载
 
 ```swift
-KLNetWork.delete("url", success: { (response) in
+KLNetWork.delete("url", parameters: nil, success: { (response) in
 // 请求成功回调
 }) { (error) in
 // 请求错误回调
@@ -125,7 +130,7 @@ KLNetWork.delete("url", success: { (response) in
 显示加载
 
 ```swift
-KLNetWork.deleteWithShowHUD("url", success: { (response) in
+KLNetWork.deleteWithShowHUD("url", parameters: nil, success: { (response) in
 // 请求成功回调
 }) { (error) in
 // 请求错误回调

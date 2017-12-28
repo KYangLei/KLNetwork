@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
+        KLNetWork.setGlobalHeaders(["token":"c75246bf-38c3-47fd-aa5d-90285e9ce34c"])
         return true
     }
 

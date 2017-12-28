@@ -22,6 +22,7 @@ public final class KLNetWork {
             if isShowHUD {
                 KLProgressHUD.show()
             }
+//            KLNetWork.setGlobalHeaders(["token":"53be4919-6c40-4ecd-8253-a9c47ec248f5"])
             Alamofire.request(url, method: method, parameters: parameters,encoding: encoding, headers: headers ?? self.globalHeaders).responseJSON { (response) in
                 if isShowHUD {
                     KLProgressHUD.dismiss()
@@ -32,7 +33,7 @@ public final class KLNetWork {
                     if success != nil {
                         let responseObject = JSON(value)
                         // 判断请求接口是否成功（api_code = 0）
-                        if responseObject["code"].intValue  == 1 {
+                        if responseObject["code"].intValue  == 200 {
                             success!(responseObject)
                         }
                         else {
@@ -53,6 +54,84 @@ public final class KLNetWork {
         }
     }
     
+    private static func downloadRequest(_ url: String, toPath:String?, parameters: [String: Any]?,downloadProgress:KLNetworkProgress?, downloadResult: KLNetworkDownloadResult?, isShowHUD: Bool = false) {
+        if KLNetWork.isReachable {
+            let destination: DownloadRequest.DownloadFileDestination = { _, response in
+                if toPath != nil {
+                    //两个参数表示如果有同名文件则会覆盖，如果路径中文件夹不存在则会自动创建
+                    return (URL.init(fileURLWithPath: toPath!), [.removePreviousFile, .createIntermediateDirectories])
+                }
+                else {
+                    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                    let fileURL = documentsURL.appendingPathComponent(response.suggestedFilename!)
+                    //两个参数表示如果有同名文件则会覆盖，如果路径中文件夹不存在则会自动创建
+                    return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
+                }
+            }
+            //开始下载
+            Alamofire.download(url, to: destination).downloadProgress(closure: { (progress) in
+                print(progress.completedUnitCount,progress.totalUnitCount)
+                
+                downloadProgress!(progress.completedUnitCount, progress.totalUnitCount)
+                if isShowHUD {
+                    KLProgressHUD.showProgress(CGFloat(progress.fractionCompleted))
+                }
+            }).response { response in
+//                print(response)
+                KLProgressHUD.dismiss()
+                let filePath = response.destinationURL?.path
+                let error = response.error
+                if error == nil {
+                    downloadResult!(filePath!,KLNetworkDownloadStatus.downloadComplete)
+                }
+                else {
+                    downloadResult!("",KLNetworkDownloadStatus.downloadFail)
+                }
+            }
+        }
+        else {
+            KLStatusBarNotification.showError(notNetworkMsg)
+        }
+    }
+    
+    private static func uploadRequest(_ imageArray:NSMutableArray,hostURL:String, parameters: [String: Any]?,uploadProgress:KLNetworkProgress?, uploadResult: KLNetworkUploadResult?, isShowHUD: Bool = false) {
+        if KLNetWork.isReachable {
+            Alamofire.upload(multipartFormData: { (multipartFormData) in
+                for temp in imageArray {
+                    let params = temp as! KLUploadParams
+                    multipartFormData.append(params.data, withName: params.paramKey, fileName: params.fileName, mimeType: params.mineType)
+                }
+            }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: hostURL, method: .post, headers: self.globalHeaders, encodingCompletion: { (encodingResult) in
+                switch encodingResult {
+                case .success(let request, _, _):
+                    request.uploadProgress(closure: { (progress) in
+                        KLProgressHUD.showProgress(CGFloat(progress.fractionCompleted))
+                        if uploadProgress != nil {
+                            uploadProgress!(progress.completedUnitCount, progress.totalUnitCount)
+                        }
+                    })
+                    request.responseJSON(completionHandler: { (response) in
+                        switch response.result {
+                        case .success(let value):
+                            KLLog.debug((response.request!.url?.absoluteString)! + "\t******\tresponse:\r\(value)")
+                            uploadResult!(KLNetworkUploadStatus.uploadComplete)
+                        case .failure(let error):
+                            KLLog.error((response.request!.url?.absoluteString)! + "\t******\terror:\r\(error.localizedDescription)")
+                            uploadResult!(KLNetworkUploadStatus.uploadFail)
+                        }
+                    })
+                case .failure(let error):
+                    KLProgressHUD.dismiss()
+                    KLProgressHUD.showError("上传文件编码错误\(error.localizedDescription)")
+                    print(error.localizedDescription)
+                }
+            })
+        }
+        else {
+            KLStatusBarNotification.showError(notNetworkMsg)
+        }
+    }
+
     //MARK: get
     public static func get(_ url: String, parameters: [String: Any]?, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
         request(url, parameters: parameters, success: success, failure: failure, method: .get, headers: headers, isShowHUD: false)
@@ -64,33 +143,44 @@ public final class KLNetWork {
     }
     
     //MARK: post
-    public static func post(_ url: String, parameters: [String: Any]? = nil, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
+    public static func post(_ url: String, parameters: [String: Any]?, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
         request(url, parameters: parameters, success: success, failure: failure, method: .post, headers: headers, isShowHUD: false)
     }
     
     //MARK: post 显示 HUD
-    public static func postWithShowHUD(_ url: String, parameters: [String: Any]? = nil, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
+    public static func postWithShowHUD(_ url: String, parameters: [String: Any]?, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
         request(url, parameters: parameters, success: success, failure: failure, method: .post, headers: headers, isShowHUD: true)
     }
     
     //MARK: put
-    public static func put(_ url: String, parameters: [String: Any]? = nil, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
+    public static func put(_ url: String, parameters: [String: Any]?, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
         request(url, parameters: parameters, success: success, failure: failure, method: .put, headers: headers, isShowHUD: false)
     }
     
     //MARK: put 显示 HUD
-    public static func putWithShowHUD(_ url: String, parameters: [String: Any]? = nil, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
+    public static func putWithShowHUD(_ url: String, parameters: [String: Any]?, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
         request(url, parameters: parameters, success: success, failure: failure, method: .put, headers: headers, isShowHUD: true)
     }
     
     //MARK: delete
-    public static func delete(_ url: String, parameters: [String: Any]? = nil, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
+    public static func delete(_ url: String, parameters: [String: Any]?, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
         request(url, parameters: parameters, success: success, failure: failure, method: .delete, headers: headers, isShowHUD: false)
     }
     
     //MARK: delete 显示 HUD
-    public static func deleteWithShowHUD(_ url: String, parameters: [String: Any]? = nil, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
+    public static func deleteWithShowHUD(_ url: String, parameters: [String: Any]?, headers: HTTPHeaders? = nil, success: KLNetworkRequestSuccess?, failure: KLNetworkRequestFailure?) {
         request(url, parameters: parameters, success: success, failure: failure, method: .delete, headers: headers, isShowHUD: true)
+    }
+    
+    //MARK: downlad 显示 HUD 简单的单个文件下载
+    public static func downloadWithShowHUD(_ url: String, toPath:String?, parameters: [String: Any]?, progress: KLNetworkProgress?, result: KLNetworkDownloadResult?) {
+        downloadRequest(url, toPath: toPath, parameters: parameters, downloadProgress: progress, downloadResult: result, isShowHUD: true)
+    }
+    
+    public static func uploadWithShowHUD(_ url: String, filesArray:NSMutableArray, parameters: [String: Any]?, progress: KLNetworkProgress?, result: KLNetworkUploadResult?) {
+        if filesArray.count > 0 {
+            uploadRequest(filesArray, hostURL: url, parameters: parameters, uploadProgress: progress, uploadResult: result, isShowHUD: true)
+        }
     }
     
     //MARK: 设置全局 headers
