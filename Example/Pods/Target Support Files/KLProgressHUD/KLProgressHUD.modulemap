@@ -1,0 +1,6 @@
+framework module KLProgressHUD {
+  umbrella header "KLProgressHUD-umbrella.h"
+
+  export *
+  module * { export * }
+}

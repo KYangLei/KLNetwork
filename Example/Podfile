@@ -1,0 +1,10 @@
+platform :ios, '10.0'
+use_frameworks!
+
+target ‘KLNetwork’ do
+
+pod 'Alamofire'
+pod 'KLProgressHUD'
+pod 'KLStatusBar'
+pod 'SwiftyJSON'
+end
