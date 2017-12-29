@@ -34,7 +34,7 @@ public typealias KLNetworkDownloadResult = (_ filePath:String?,_ status:KLNetwor
 public typealias KLNetworkUploadResult = (_ status:KLNetworkUploadStatus) -> Void
 public typealias KLNetworkReachabilityListener = (_ status: KLNetworkReachabilityStatus) -> Void
 
-class KLUploadParams: NSObject {
+public class KLUploadParams: NSObject {
     /**
      *  上传文件的二进制数据
      */
@@ -50,9 +50,9 @@ class KLUploadParams: NSObject {
     /**
      *  上传文件的类型
      */
-    var mineType:String!
+    var mineType:String! = "image/png"
     /**
      *  如果是图片，则上传的图片压缩比例（0 - 1）浮点型
      */
-    var quality:CGFloat!
+    var quality:CGFloat! = 0.5
 }

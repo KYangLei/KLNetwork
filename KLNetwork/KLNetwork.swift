@@ -94,12 +94,11 @@ public final class KLNetWork {
         }
     }
     
-    private static func uploadRequest(_ imageArray:NSMutableArray,hostURL:String, parameters: [String: Any]?,uploadProgress:KLNetworkProgress?, uploadResult: KLNetworkUploadResult?, isShowHUD: Bool = false) {
+    private static func uploadRequest(_ imageArray:[KLUploadParams],hostURL:String, parameters: [String: Any]?,uploadProgress:KLNetworkProgress?, uploadResult: KLNetworkUploadResult?, isShowHUD: Bool = false) {
         if KLNetWork.isReachable {
             Alamofire.upload(multipartFormData: { (multipartFormData) in
-                for temp in imageArray {
-                    let params = temp as! KLUploadParams
-                    multipartFormData.append(params.data, withName: params.paramKey, fileName: params.fileName, mimeType: params.mineType)
+                for param in imageArray {
+                    multipartFormData.append(param.data, withName: param.paramKey, fileName: param.fileName, mimeType: param.mineType)
                 }
             }, usingThreshold: SessionManager.multipartFormDataEncodingMemoryThreshold, to: hostURL, method: .post, headers: self.globalHeaders, encodingCompletion: { (encodingResult) in
                 switch encodingResult {
@@ -111,6 +110,7 @@ public final class KLNetWork {
                         }
                     })
                     request.responseJSON(completionHandler: { (response) in
+                        KLProgressHUD.dismiss()
                         switch response.result {
                         case .success(let value):
                             KLLog.debug((response.request!.url?.absoluteString)! + "\t******\tresponse:\r\(value)")
@@ -177,7 +177,8 @@ public final class KLNetWork {
         downloadRequest(url, toPath: toPath, parameters: parameters, downloadProgress: progress, downloadResult: result, isShowHUD: true)
     }
     
-    public static func uploadWithShowHUD(_ url: String, filesArray:NSMutableArray, parameters: [String: Any]?, progress: KLNetworkProgress?, result: KLNetworkUploadResult?) {
+    //MARK: upload 显示 HUD 上传文件
+    public static func uploadWithShowHUD(_ url: String, filesArray:[KLUploadParams], parameters: [String: Any]?, progress: KLNetworkProgress?, result: KLNetworkUploadResult?) {
         if filesArray.count > 0 {
             uploadRequest(filesArray, hostURL: url, parameters: parameters, uploadProgress: progress, uploadResult: result, isShowHUD: true)
         }
