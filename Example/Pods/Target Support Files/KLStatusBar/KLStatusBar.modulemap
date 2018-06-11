@@ -1,6 +1,0 @@
-framework module KLStatusBar {
-  umbrella header "KLStatusBar-umbrella.h"
-
-  export *
-  module * { export * }
-}

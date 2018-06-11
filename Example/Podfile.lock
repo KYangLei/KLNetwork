@@ -1,21 +1,20 @@
 PODS:
   - Alamofire (4.6.0)
   - KLProgressHUD (1.0.1)
-  - KLStatusBar (1.0.0)
-  - SwiftyJSON (4.0.0)
 
 DEPENDENCIES:
   - Alamofire
   - KLProgressHUD
-  - KLStatusBar
-  - SwiftyJSON
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Alamofire
+    - KLProgressHUD
 
 SPEC CHECKSUMS:
   Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
   KLProgressHUD: a853cb933344a59a1a577bc89f54c6e58e5b30b2
-  KLStatusBar: 86bc81ea1948d7b081747bd6b9ff14d9bab080f4
-  SwiftyJSON: 070dabdcb1beb81b247c65ffa3a79dbbfb3b48aa
 
-PODFILE CHECKSUM: 44066318f40be8e0b0822236fb5e8b21e7d04031
+PODFILE CHECKSUM: 27e8b774c7298c7c6906c09a0ea6112978feb904
 
-COCOAPODS: 1.4.0.rc.1
+COCOAPODS: 1.5.3

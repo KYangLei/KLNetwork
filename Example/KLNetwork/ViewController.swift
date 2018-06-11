@@ -7,36 +7,29 @@
 //
 
 import UIKit
-import Alamofire
-import AVFoundation
+import KLProgressHUD
 
 class ViewController: UIViewController {
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        KLNetWork.get("http://httpbin.org/get", parameters: nil, success: { (response) in
-            print(response)
+        KLNetworkHandler.sharedManager.loadData(Path: "member/getMember", showHud: true, HTTPMethod: .get, nil, .body, Success: { (response:[String:AnyObject]) in
         }) { (error) in
 
         }
-        
-
-
-        
+    
     }
     
-    
-    
-    
-    
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+       
+    }
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
 }
-

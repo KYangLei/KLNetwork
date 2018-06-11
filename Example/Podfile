@@ -5,6 +5,4 @@ target ‘KLNetwork’ do
 
 pod 'Alamofire'
 pod 'KLProgressHUD'
-pod 'KLStatusBar'
-pod 'SwiftyJSON'
 end
